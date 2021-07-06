@@ -1,0 +1,54 @@
+Momentum là thuật toán ra đời nhằm khắc phục hiện tượng GC rơi vào điểm local minimum không mong muốn.
+
+GRADIENT DESCENT VỚI MOMENTUM
+- Trong GD, chúng ta cần tính lượng thay đổi ở thời điểm t để cập nhật vị trí mới cho nghiệm. 
+- Nếu chúng ta coi đại lượng này như vt trong vật lý, vị trí mới của hòn bi là: theta_(t+1) = theta_t - vt
+- Đại lượng vt cần vừa mang thông tin độ dốc, vừa mang thông tin của đà, tức vận tốc trước đó v_(t-1).
+- Để đơn giản, ta có:
+			v_t = gamma*v_(t-1) + eta*nabla_theta(J(theta))
+	+) gamma ~ 0.9
+	+) v*(t-1): vận tốc thi điểm trước đó
+	+) nabla_theta(J(theta)) là độ dốc của điểm trước đó. 
+- Vị trí hòn bi: theta = theta - vt
+Tương tự với không gian hai chiều.
+
+NESTEROV ACCELERATED GRADIENT (NAG)
+- Hạn chế của momentum: Khi tới gần đích, momentum mất khá nhiều thời gian để dừng lại.
+- Ý tưởng cơ bản: Dự đoán hướng đi trong tương lai.à 
+Cụ thể, nếu sử dụng momentum gamma*v(t-1) để cập nhật thì ta có thể xấp xỉ vị trí tiếp theo của hòn bi là theta - gamma*v_(t-1).
+Tuy nhiên, thay vì sử dụng gradient của điểm hiện tại, NAG đi trước 1 bước, sử dụng gradient của điểm tiếp theo.
++) Với moment thông thường: Lượng thay đổi là tổng momentum vector và gradient của thời điểm hiện tại.
++) Với Nesterov momentum: Lượng thay đổi là tổng momentum vector và gradient ở thời điểm xấp xỉ là điểm tiếp theo.
+- Công thức cập nhật: 
+			v_t = gamma*v_(t-1) + eta*nabla_theta(J(theta - gamma*v_(t-1)))
+			theta = theta - v_t
+
+BIẾN THỂ CỦA GRADIENT DESCENT
+- Đối với bài toán Linear Regression:
+	+) Hàm mất mát là J(w) = 1/(2N) Tổng i = 1 đến N (x_iw - y_i)^2
+	+) Đạo hàm: 1/N*Tổng i = 1 đến N x_i^T*(x_iw - y_i)
+	
+BATCH GRADIENT DESCENT 
+Thuật toán GD từ đầu đến giwof được gọi là Batch Gradient Descent. Batch được hiểu là tất cả, tức khi cập nhật, theta = w, chúng ta sử dụng tất cả các điểm dữ liệu x.
+=> Hạn chế khi CSDL có nhiều điểm + online learning.
+
+STOCHASTIC GRADIENT DESCENT
+- Tại 1 thời điểm, ta chỉ tính đạo hàm của hàm mất mát dựa trên chỉ một điểm dữ liệu xi rồi cập nhật theta dựa trên đạo hàm này.
+- Mỗi lần duyệt một lượt qua tất cả các điểm trên toàn bộ dữ liệu => 1 epoch.
+Với GD, mỗi epoch ứng với 1 lần cập nhật theta.
+Với SGD, mỗi epotch ứng với N lần cập nhật theta với N là số điểm dữ liệu. 
++) Giảm tôc sdodoj thực hiện 1 epotch
++) Yêu cầu rất ít epoch 
+- SGD => Deep learning/ Online learning
+
+THỨ TỰ LỰA CHỌN ĐIỂM DỮ LIỆU
+- Cần xáo trộng thứ tự các dữ liệu để đảm bảo tính ngẫu nhiên.
+
+QUY TẮC CẬP NHẬT SGD
+			theta = theta - eta*nabla_theta(theta; x_1; y_i)
+Với Vnabla_theta(theta; x_1; y_i) là hàm mất mát với chỉ 1 điểm dữ liệu.
+Ví dụ với bài toán LR: theta = w
+			J(w; x_il y_i) = 1/2(x_iw-yi)^2
+Đạo hàm tương ứng:
+	Nabla_theta(w; xi; yi) = x_i^T(x_iw - y_i)
+	

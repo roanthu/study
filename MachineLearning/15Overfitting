@@ -1,0 +1,5 @@
+OVERFITTING
+- Overfitting là hiện tượng mô hình tìm được quá khớp với dữ liệu training.
+- Việc quá khớp có thể dẫn đến việc dự đoán nhầm nhiễu => Mô hình không còn tốt trên dữ liệu test nữa.
+- Hai đại lượng đánh giá mô hình:
+	+) Train error = 1/N_train

@@ -1,0 +1,53 @@
+GIỚI THIỆU
+- Local minimum = Điểm cực tiểu
+Global minimum = Điểm mà tại đó hàm số đạt giá trị nhỏ nhất
+- Xét một hàm khả vi ở mọi nơi:
+1. Local minimum x* của hàm số là điểm có đạo hàm f'(x*) = 0. Hơn nữa, đạo hàm các điểm phía bên trái x* không dương và đạo hàm bên phải x* không âm.
+2. Đường tiếp tuyến với đồ thị hàm số tại 1 điểm bất kỳ có hệ số góc = đạo hàm của hàm số tại điểm đó.
+
+GRADIENT DESCENT
+- Nhu cầu: Tìm giá trị nhỏ nhất của một hàm số nào đó. VD, các hàm mất mát trong hai bài Linear Regression và K-means Clustering.
+- Nhìn chung, việc tìm global minimum của các hàm này là rất phức tạp => Thay vào đó, chúng ta thường cố gắng tìm các điểm local minimum.
+- Hướng tiếp cận phổ biến: Xuất phát từ một điểm "gần" với nghiệm của bài toán, sau đó dùng một phương pháp lặp để tiến dần đến điểm cần tìm, tức là đến khi đạo hàm gần với 0.
+Gradien Descent (GD) và các biến thể là những phương pháp thường được sử dụng nhiều nhất.
+
+GRADIENT DESCENT CHO HÀM 1 BIẾN
+- x_t là điểm tìm được sau vòng lặp thứ t. Ta cần tìm thuật toán để đưa xt về càng gần x* càng tốt.
+- Các quan sát:
+	+) Chúng ta cần di chuyển ngược dấu đạo hàm: x_(t+1) = x_t + Delta
+	trong đó Delta ngược dấu với f'(x_t)
+	+) Lượng di chuyển tỉ lệ thuận với f'(x_t)
+	Vậy, ta có: x_(t+1) = x_t - eta*f'(x_t)
+		-> eta là một số nguyên dương được gọi là learning rate (tốc độ học)
+		-> Dấu trừ -> đi ngược với đạo hàm (Descent)
+
+VÍ DỤ ĐƠN GIẢN VỚI PYTHON
+- Vòng lặp ứng với x0 = -5, nghiệm hội tụ nhanh hơn vì điểm ban đầu x0 gần với nghiệm x* ~ -1 hơn.
+- Tốc độ hội tụ của GD không chỉ phụ thuộc vào điểm khởi tạo ban đầu mà còn phụ thuộc vào learning rate. 
+Quan sát:
++) Với learning rate nhỏ eta = 0.01, tốc độ hội tụ rất chậm.
++) Với learning rate lớn eta = 0.5, thuật toán tới gần đích sau vài vòng lặp nhưng không hội tụ được vì bước nhảy lớn.
+- Việc lựa chọn learning rate rất quan trọng trong ví dụ thực tế. Nó phụ thuộc nhiều vào từng bài toán + một số thí nghiệm.
+Ngoài ra, tùy vào bài toán, GD có thể hiệu quả nếu chọn learning rate phù hợp hoặc chọn learning rate khác nhau ở mỗi vòng lặp.
+
+GRADIENT DESCENT CHO HÀM NHIỀU BIẾN
+- Giả sử ta cần tìm global minimum cho f(theta) trong đó theta là một vector dùng để ký hiệu tập hợp các tham số của một mô hình cần tối ưu.
+(VD: w trong Linear Regression)
+- Đạo hàm của hàm số tại một điểm theta bất kỳ được ký hiệu: Nabla_theta của f(theta).
+- Tương tự hàm một biến, thuật toán GD cho hàm nhiều biến cũng bắt đầu bằng 1 điểm dự đoán theta0, sau vòng lặp thứ t, quy tắc cập nhật là:
+		theta_(t+1) = theta_t - eta*nabla_theta(f(theta_t))
+		hoặc theta = theta - eta*nabla_theta(f(theta_t))
+		
+QUAY LẠI BÀI TOÁN LINEAR REGRESSION
+- Hàm mất mát: L(w) = 1/2N ||hy-Xbar*w||_2^2 (mẫu số có thêm N = số lượng điểm dữ liệu) 
+- Đạo hàm của hàm mất mát là: Nabla_w(L(w)) = 1/N*(Xbar)^T(Xbar*w - y)
+
+KIỂM TRA ĐẠO HÀM
+- Với hàm một biến:
+			f'(x) ~ (f(x+epsilon) - f(x-epsilon))/(2*epsilon)
+Chứng minh bằng hình học & giải tích
+- Với hàm nhiều biến:
+	+) Áp dụng công thức trên nhưng giảm số chiều dữ liệu & số điểm dữ liệu.
+	+) Đạo hàm tính được cần gần với numerical gradient.
+
+			

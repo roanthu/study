@@ -1,0 +1,5 @@
+- np.asarray(X) - xem X như một mảng. (X có thể là một List, Tuple...)
+- KMeans(n_cluster=K).fit(X) - thực hiện thuật toán kmeans với số cụm là K, bộ dữ liệu là X.
+- pred_label = kmeans.predict(X) => Nhãn được dự đoán của mỗi điểm dữ liệu.
+- plt.imshow() - hiển thị ảnh
+- f1.axes.get_xaxis().set_visible(False) - ẩn trục x

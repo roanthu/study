@@ -1,0 +1,93 @@
+GIỚI THIỆU
+
+- Thuật toán đầu tiên trong lớp bài toán Classification
+- Trong TH chỉ có hai lớp (Binary Classification)
+- Bài toán Classification có nghĩa là đi tìm biên giới giữa các "lãnh thổ" của mỗi class.
+- Boundary đơn giản nhất là các "đường phẳng".
+
+BÀI TOÁN PERCEPTRON 
+- "Cho hai class được gán nhãn, tìm một đường thẳng sao cho toàn bộ các điểm thuộc class 1 nằm về 1 phía, toàn bộ các điểm thuộc class 2 nằm về phía còn lại của đường phẳng này. Với giả định tồn tại 1 đường như thế."
+- Nếu tồn tại đường phẳng phân chia hai class này => Linearly separable.
+=> Thuật toán Linear Classifier.
+
+THUẬT TOÁN PERCEPTRON (PLA)
+- Ý tưởng: Từ 1 nghiệm nào đó, qua mỗi vòng lặp, nghiệm cập nhật tới 1 vị trí tốt hơn. Việc cập nhật này làm giảm giá trị 1 hàm mất mát nào đó.
+- Một số ký hiệu:
+	+) Ma trận X = [x1, x2,....,x_N] là ma trận mà mỗi cột chứa một điểm dữ liệu trong không gian d chiều (khác với các bài trước).
+	+) Nhãn tương ứng với từng điểm dữ liệu được lưu trong 1 vector hàng y = [y1, y2,..., yN] với yi = 1 nếu x thuộc class 1 và iyi = -1 nếu ngược lại.
+	+) Tại 1 thời điểm, boundary là đường phẳng: 
+		f_w(x) = w1x1 + w2x2 +... + wdxd + w0 = w^T*xbar = 0
+	với xbar là điểm dữ liệu mở rộng bằng cách thêm x0 = 1 lên trước vector x. 
+- Để đơn giản, ta cho d = 2.
+- Ta có: label(x) = 1 if w^T*x >= 0 và = -1 nếu ngược lại.
+				label(x) = sgn(w^T*x)
+
+XÂY DỰNG HÀM MẤT MÁT
+- Hàm mất mát = Số lượng điểm bị misclassified
+				J1(w) = Tổng(xi thuộc M) (-yi*sgn(w^T*xi))
+với M là tập điểm bị misclassified.
+- Đây là hàm rời rạc, không tính được đạo hàm => Khó tối ưu.
+=> Xét hàm mất mát:
+				J(w) = Tổng(xi thuộc M)(-yi*wT*xi)
+	+) x_i càng xa boundary thì sai lệch càng lớn.
+	+) Hàm mất mát này tốt hơn J1() vì nó "trừng phạt" rất nặng những điểm lấn sâu sang lãnh thổ class kia.
+- Vì ưu điểm của SGD cho các bài toán large-scale => Sử dụng thuật toán này.
+	+) Với một điểm dữ liệu xi bị misclassified, hàm mất mát trở thành:
+				J(w; xi; yi) = -yi*w^T*xi
+	+) Đạo hàm tương ứng:
+				Nabla_w(J(w, xi, yi)) = -yi*xi
+	=> Quy tắc cập nhật: w  = w + eta*yi*xi với eta là tốc độ học.
+	+) Vì w là nghiệm thì eta*w cũng là nghiệm với eta khác 0 bất kỳ. Vậy, nếu w0 nhỏ gần với 0 và số vòng lặp đủ lớn, ta có thể coi eta = 1.
+=> Như vậy: w_(t+1) = w_t + yi*xi
+- Quan sát: w_(t+1)^(T)xi = w_t^T*xi + yi*||xi||_2^2
+	+) Nếu yi = 1, vì xi bị misclassifed nên w_t*T*xi < 0 còn yi*||xi||_2^2 >= 1 (do x0 = 1). 
+	+) Vậy: w_(t+1)^T*xi > w_t^T*xi => w_(t+1) tiến về phía làm cho x_i được phân lớp đúng. Tương tự với yi = -1.
+	
+TÓM TẮT PLA
+1. Chọn ngẫu nhiên một vector hệ số w gần 0.
+2. Duyệt ngẫu nhiên qua từng điểm xi:
+- Nếu xi được phân lớp đúng, chúng ta không cần làm gì.
+- Nếu xi bị misclassified, cập nhật w = w + yi*xi
+3. Kiểm tra xem có bao nhiêu điểm bị misclassified. Nếu không còn điểm nào, dừng thuật toán.
+Nếu còn, quay lại bước 2.
+
+CHỨNG MINH HỘI TỤ
+- Giả sử w* là một nghiệm của bài toán => alpha*w* là một nghiệm của bài toán. Xét dãy số không âm:
+			u_alpha(t) = ||w_t - alpha*w*||_2^2
+- Với xi là một điểm bị misclassified nếu dùng nghiệm w_t, ta có:
+	u_alpha(t+1)	= ||w_(t+1) - alpha*w*||_2^2
+					= ||w_(t) + yixi - alpha*w*||_2^2
+					= ||w_(t) - alpha*w*||_2^2 + yi^2||xi||_2^2 + 2yi*xi^T*(w - aw*)
+					<= u_alpha(t) + ||xi||_2^2 - 2*alpha*yi*xi^T*w*
+- Đặt beta^2 = max||xi||_2^2, gamma = min(yi*xi^T*w*). 
+Chọn alpha = beta^2/gamma, ta có: 0 <= u_alpha(t+1) < u_alpha(t) - beta^2.
+	+) Nếu luôn có các điểm bị misclassified thì dãy u_alpha(t) là dãy giảm, bị chặn dưới bởi 0 và luôn giảm một lượng beta^2. Điều này vô lý.
+	=> PLA phải hội tụ sau 1 số hữu hạn bước.
+	
+MÔ HÌNH NEURAL NETWORK ĐẦU TIÊN
+x0 O.
+       w0
+x1 O.     . 
+       w1    .
+x2 O...w2.....O---->O
+       w3    .z     y
+x3 0.     .         
+       w4 
+x4 0.  
+- Tập các node xi => Input layer.
+- Node y = sgn(x) là output của network.
+- Hàm số y = sgn(z) được gọi là activation function. Đây chính là dạng đơn giản nhất của Neural Network. 
+- Các Neural Networks  sau này có thể có nhiều output tạo thành một output layer hoặc các layer trung gian (hidden layer).
+- Để ý: Nếu ta thay activation function bởi y = z, ta sẽ có Neural Network mô tả thuật toán Linear Regression. 
+
+THẢO LUẬN
+- PLA có thể cho vô số nghiệm khác nhau. Đường nào là đường tốt nhất?
+- PLA đòi hỏi dữ liệu linearly separable. Việc không hội tụ với dữ liệu gần linearly seperable chính là một nhược điểm lớn của PLA.
+=> Cải tiến nhỏ như thuật toán Pocket Algorithm.
+	+) Nếu có một vài nhiễu, ta đi tìm đường thẳng phân chia hai class sao cho có ít điểm bị misclassiffied nhất. 
+	+) Việc này có thể được thực hiện thông qua PLA như sau:
+	1. Giới hạn số lượng vòng lặp của PLA
+	2. Mỗi lần cập nhật nghiệm w mới, ta đếm số lượng điểm bị misclassified. Nếu là lần đầu, ta giữu nghiệm này trong pocket. Nếu không, ta so sánh số điểm này với số điểm misclassified của nghiệm trong pocket, nếu nhỏ hơn thì lôi nghiệm cũ ra, đặt nghiệm mới vào.
+	Thuật toán này tương tự thuật toán tìm phần tử nhỏ nhất trong 1 mảng.
+	
+ 

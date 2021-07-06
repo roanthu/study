@@ -1,0 +1,48 @@
+K-NEAREST NEIGHBOR
+- Là một trong những thuật toán học giám sát đơn giản nhất trong Machine Learning.
+- Nó không học bất cứ điều gì từ dữ liệu training mà mọi tính toán được thực hiện khi nó cần dự đoán kết quả của dữ liệu mới.  
+=> Được xếp vào loại lazy learning. 
+- Được áp dụng vào cả Phân loại (Classification) và Hồi quy (Regression).
+- Thuộc loại instanced-based hay Memory-based learning.
+- Nói tóm lại, KNN là thuật toán đi tìm đầu ra của một điểm dữ liệu mới bằng chỉ dựa trên thông tin của K điểm dữ liệu tring traing set gần nó nhất (K lân cận), không quan tâm đến việc có vài điểm dữ liệu trong những điểm gần nhất này là nhiễu.
+
+PHÂN TÍCH TOÁN HỌC
+- Lưu ý: KNN phải nhớ tất cả các điểm dữ liệu training, việc này không được lợi về cả bộ nhớ lẫn thời gian tuyến tính.
+
+VÍ DỤ
+- Khái niệm groud truth đơn giản là nhãn/ label/ đầu ra thực sử của các điểm trong test data.
+
+PHƯƠNG PHÁP ĐÁNH GIÁ
+- Để đánh giá độ chính xác, ta xem có bao nhiêu điểm trong test dât được dự đoán đúng. Lấy số lượng này chia cho tổng số lượng trong tập test data sẽ ra độ chính xác.
+- Scikit-learn cung cấp hàm số accuracy_store để thực hiện công việc này.
+- Chỉ xét 1 điểm gần nhất => Kết quả sai nếu đó là nhiễu. Để tăng độ chính xác => Tăng số lượng điểm lân cận, VD: 10, xem trong 10 điểm gần nhất, class nào chiếm đa số thì dự đoán kết quả là class đó. 
+=> Kỹ thuật major voting.
+
+ĐÁNH TRỌNG SỐ CHO CÁC ĐIỂM GẦN NHẤT
+- Để công bằng, những điểm gần hơn nên có trọng số cao hơn.
+- Ta đánh trọng số sao cho điểm càng gần test dât thì trọng số càng cao, đơn giản nhất, sử dụng nghịch đảo khoảng cách (nếu test dât = điểm dữ liệu trong traing dât, ta lấy luôn label của điểm traing data).
+- Scikit-learn: Ta gán weights = 'distance' (giá trị mặc định của weigh là 'uniform', tức là tất cả các điểm lân cận có giá trị như nh)
+* Chú ý: Ngoài 2 phương pháp đánh trọng số weights = 'uniform' và weights = 'distance', scikit-learn còn cung cấp một cách để dánh trọng số một cách tùy chọn
+VD:
+def myweight(distances):
+	sigma2 = .5 # Có thể thay đổi
+	return np.exp(-distance**2/sigma2)
+clf = neighbors.KNeighborsClassifier(n_neighbors = 10, p =2, weights = myweight)
+- Chúng ta nên thực hiện quá trình trên với nhiều cách chia dữ liệu rating và test khác nhau rồi lấy kết quả trung bình.
+=> Thường dùng khi đánh giá hiệu năng.
+
+THẢO LUẬN
+* KNN cho Regression: Tương tự
+* Chuẩn hóa dữ liệu: 
+- Khi có một thuộc tính trong dữ liệu lớn hơn các thuộc tính khác rất nhiều, khoảng cách các điểm sẽ phụ thuộc vào thuộc tính này rất nhiều.
+- Để có kết quả chính xã, ta sử dụng kỹ thuật Data Normalization (chuẩn hóa dữ liệu) => Đưa các thuộc tính về cùng một khoảng giá trị trước khi thực hiện KNN.
+- Có nhiều kỹ thuật chuẩn hóa khác nhau.
+* Sử dụng các phép đo khoảng cách khác nhau
+* Ưu điểm của KNN: 
+1. Độ phức tạp tính toán của quá trình training = 0
+2. Việc dự đoán kết quả dữ liệu mới đơn giản
+3. Không cần giả sử phân phối của các class
+* Nhược điểm của KNN
+1. Nhạy cảm với nhiễu khi K nhỏ
+2. Tốn thời gian + không gian bộ nhớ
+	

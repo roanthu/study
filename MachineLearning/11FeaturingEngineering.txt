@@ -1,0 +1,84 @@
+GIỚI THIỆU
+- Trong các thuật toán trước, các điểm dữ liệu được biểu diễn bằng các vector - các vector đặc trưng (feature vector).
+- Tuy nhiên, điều này không đúng với các bài toán thực tế.
+- Khi làm việc với các bài toán ML thực tế, dữ liệu có được ở dạng thô. Chúng ta cần tìm 1 phép biến đổi để đưa dữ liệu thô với số chiều khác nhau về cùng 1 chuẩn (cùng là các vector hoặc ma trận). 
+Quá trình quan trọng này được gọi là Feature Extraction hay Feature Engineering, tức trích chọn đặc trưng.
+
+MÔ HÌNH CHUNG CHO CÁC BÀI TOÁN MACHINE LEARNING
+- Có 2 phase lớn là Training phase và Testing phase. 
+
+TRAINING PHASE 
+Chúng ta cần phải thiết kế:
+- Feature Extractor:
+	+) Đầu ra: Tạo ra một feature extractor biến dữ liệu thô ban đầu thành dữ liệu phù hợp với từng mục đích khác nhau.
+	+) Đầu vào: 
+		-> Raw training input: Là tất cả các thông tin ta biết về dữ liệu.
+		-> (Optional) Output của training set (trong supervised learning, có khi còn không được sử dụng).
+		   Ví dụ: nếu ră input có cùng số chiều nhưng số chiều quá lớn => Muốn giảm số chiểu, ta chiếu nó xuống 1 không gian có số chiều nhỏ hơn bằng cách lấy ma trận béo (số hàng < số cột) nhân với nó.
+		   Mặc dù có thể làm mất đi thông tin => Trong nhiều TH, vẫn mang lại hiệu quả do giảm lượng tính toán.
+		   Đôi khi ma trận chiếu được học dựa trên toàn bộ raw input, ta sẽ có bài toán tìm ma trận chiếu sao cho thông tin mất đi là ít nhất.
+		-> (Optional) Prior knowledge about dât: Đôi khi những giả thiết khác về dữ liệu cũng mang lại lợi ích. 
+		   Ví dụ: Trong bài toán Clasification, nếu ta biết dữ liệu gần như linear separable thì ta sẽ đi tìm một ma trận chiếu sao cho trong không gian mới, dữ liệu vẫn đảm bảo tính linear seperable.
+	=> Extracted features.
+- Main Algorithm:
+	+) Khi có extracted features rồi, ta sử dụng thông tin này cùng với (optional) training output và (optional) prior knowledge để tạo ra các mô hình phù hợp.
+- Khi xây dựng bộ Feature extractor và main algorithms, chúng ta không được sử dụng bất kỳ thông tin nào từ tập test data.
+
+TESTING PHASE
+
+MỘT SỐ VÍ DỤ VỀ FEATURE ENGINEERING
+- Trực tiếp lấy Raw data: 
+	+) Biến đổi ma trận 28x28 -> Vector có 784 chiều trong bộ cơ sở dữ liệu MNIST. Vector này sẽ được trự tiếp sử dụng làm feature đưa vào các bộ classifier/ clustering/ regression.
+	+) Làm mất thông tin về không gian giữa các điểm ảnh.
+- Feature selection: dữ
+	+) Giả sử các điểm dữ liệu có số features khác nhau và số lượng feature cực lớn. Ta cần chọn ra một số lượng nhỏ hơn các feature phù hợp với bài toán. 
+- Dimensionality reduction
+	+) Giảm chiều của dữ liệu để giảm bộ nhớ và khối lượng tính toán
+	+) Nhiều cách. 
+	+) Random projection là cách đơn giản nhất. 
+	Chọn một ma trận chéo ngẫu nhiên rồi nhân nó với từng điểm dữ liệu (giả sử, dữ liệu vector ở dạng vector cột) 
+	+) Để hạn chế lượng thông tin mất đi, ta sử dụng Principle Component Analysis.
+- Bag of Words
+	+) Ví dụ: 
+		(1) John likes to eatch movies. Mary likes movies too.
+		(2) John also likes to watch football games.
+	+) Ta xây dựng danh sách các từ được sử dụng (hay từ điển) với 10 từ sau:
+		["John", "likes", "to", "watch", "movies", "also", "football", "games", "Mary", "too"]
+	+) Với mỗi văn bản, ta xây dựng vector đặc trưng có số chiều bằng 10, mỗi phần tử đại diện cho số từ tương ứng xuất hiện trong văn bản đó. 
+		(1) [1, 2, 1, 1, 2, 0, 0, 0, 1, 1]
+		(2) [1, 1, 1, 1, 0, 1, 1, 1, 0, 0]
+	+) Lưu ý: 
+		-> Từ điển có rất nhiều từ.
+		-> Vector đặc trưng thường có rất nhiều phần tử bằng 0 (thưa). Có thể lưu các vị trị và giá trị của các phần tử khác 0.
+		-> Mở rộng vector đặc trưng thêm 1 phần tử (gọi là <Unknown>) để biểu diễn 1 từ không có trong từ điển.
+		-> Tuy vậy, 1 từ hiếm gặp đôi khi lại mang thông tin quan trọng nhất của văn bản. => Sử dụng TF-IDF.
+		-> BoW không mang thông tin về thứ tự của từ. 
+		VD: Do I know you? vs I do know you. 
+- Bag-of-Words torng Computer Vision  
+	+) VD1: Hai class ảnh, một class là khu rừng, một class là ảnh các sa mạc. 
+	Ta có thể phân loại theo màu sắc. Màu xanh = rừng, màu đỏ + vàng = sa mạc.
+	Mô hình trích chọn đặc trưng:
+		-> Với 1 bức ảnh, chuẩn bị một vector x có số chiều bằng 3, địa diện cho 3 màu xanh (x1), đỏ (x2), và vàng (x3).
+		-> Với mỗi điểm ảnh, dựa vào giá trị pixel để xem nó gần với xanh, đỏ hay vàng nhất. 
+		Nếu nó gần với điểm xanh nhất, tăng x1 lên 1. Tương tự.
+		-> Như vậy, sau khi xét tất cả các điểm ảnh, dù kích thước bức ảnh thế nào => Ta đều thu được vector có độ dài bằng 3. 
+		   Vector này được gọi là vector histogram. Từ vector này, ta có thể quyết định bức ảnh này là rừng hay sa mạc.
+	+) VD2: Thực tế, ta thường xem xét một cửa sổ nhỏ trong ảnh chứa các điểm ảnh gần nhau (patch) thay vì một điểm ảnh. Cửa sổ này đủ lớn để chứa các bộ phận có thể mô tả vật thể D: Mắt, mũi, miệng).
+		NGẮN:
+		-> Hai patches được xem là gần giống nhau nếu khoảng cách Euclid giữa hai vector tạo bởi hai patches đó gần nhau. 
+		-> Từ điển sẽ có số phần tử tùy chọn. (Số phần tử càng cao -> Sai lệch càng ít)
+		DÀI:
+		-> Áp dụng K-means clustering. Với rất nhiều patches thu được, giả sử ta muốn xây dựng một codebook với khaonrg 1000 words, ta cho k = 1000 rồi thực hiện K-means clustering. 
+		-> Thu được 1000 centers tương ứng. Mỗi centers = 1 words và tất cả những điểm rơi vào cùng 1 cluster => Cùng một bag.
+		=> Vector đặc trưng cho từng bức ảnh.
+
+FEATURE SCALING AND NORMALIZATION
+- Một số phương pháp chuẩn hóa cần dùng:
+	+) Rescaling: Đưa tất cả các thành phần về cùng một khoảng [0, 1] hoặc [-1, 1]
+	=> Nếu muốn đưa một feature về khoảng [0, 1]m công thức sẽ là:
+			x' = (x-min(x))/(max(x)-min(x))
+	trong đó x là giá trị ban đầu, x' là giá trị sau khi chuẩn hóa. min(x), max(x) được tính trên toàn bộ dữ liệu traing dât ở cùng một thành phần. 
+	+) Standardization: Giả sử mỗi thành phần có kỳ vọng 0, phương sai 1.
+			x' = (x - xbar)/(sigma)
+	+) Scaling to unit length:
+			x' = x/||x||_2

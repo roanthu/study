@@ -1,0 +1,66 @@
+GIỚI THIỆU
+- K-means là một trong những thuật toán cơ bản nhất của Unsupervised learning .
+- Mục đích: Phân dữ liệu thành các cụm khác nhau sao cho dữ liệu trong cùng một cụm có tính chất giống nhau.
+
+
+PHÂN TÍCH TOÁN HỌC
+- Giả sử, có N điểm dữ liệu X = [x1, x2,..., xN] thuộc R^(dxN). K < N là số clustering chúng ta muốn phân chia. 
+	%x có d thuộc tính
+- Ta cần tìm center m1, m2, ..., mN và label của các điểm dữ liệu.
+- Với mỗi xi, đặt yi = [yi1, yi2,...,yiK] là label vector của nó, trong đó nếu xi thuộc cluster k thì yik = 1 và yij khác 0 (j khác k).
+Cách biểu diễn này được gọi là one-hot. Rành buộc của y có thể viết dưới dạng: y thuộc {0, 1}, (Tổng từ k = 1 đến k = K của yik) = 1.
+
+
+HÀM MẤT MÁT VÀ BÀI TOÁN TỐI ƯU
+- Một điểm dữ liệu xi được phân vào cluster mk sẽ có sai số (xi - mk). 
+- Mục tiêu: Cực tiểu hóa đại lượng ||xi - mk||_2^2
+- Hơn nữa, vì xi được phân vào cluster mk nên yik = 1 và yij khác 0 (j khác k), tức:
+(Tổng từ k = 0 đến k = K của yik)*|||xi - mk|_2^2
+- Sai số cho toàn bộ dữ liệu hay Hàm mất mát trong bài toán K-means clustering là:
+					L(Y, M)	=	(Tổng từ i = 1 đến k = N)*(Tổng từ k = 1 đến k = K của yik)*|||xi - mk|_2^2
+trong đó: Y = [y1; y2;...; yN] và M = [m1, m2,..., mK]
+- Nói tóm lại, chúng ta cần tối ưu bài toán (2):
+					   Y, M	=	argmin (Tổng từ i = 1 đến k = N)*(Tổng từ k = 1 đến k = K của yik)*|||xi - mk|_2^2
+thỏa mãn: y thuộc {0, 1}, (Tổng từ k = 1 đến k = K của yik) = 1.
+
+
+THUẬT TOÁN TỐI ƯU HÀM MẤT MÁT
+- Một cách để giải bài toán (2) là xen kẽ giải Y và M khi biến còn lại được cố định.
+Đây là một thuật toán lặp, cũng là một kỹ thuật phổ biến khi giải bài toán tối ưu.
+
+* Cố định M, tìm Y.
+- Giả sử đã tìm được các centers, tìm label vector để hàm giá trị min. Tức, tìm cluster cho các điểm dữ liệu.
+- Khi các centers cố định, bài toán tìm label vector cho toàn bộ dữ liệu có thể được chia nhỏ thành bài toán tìm label vector cho từng xi:
+					yi = argmin (Tổng từ j đến K cuaruar yij)||xi - mk||^2_2
+Bài toán có thể đơn giản hóa thành:
+					j = argmin||xi - mj||^2_2
+Đây chính là bình phương khoảng cách từ xi đến mj, ta có thể kết luận rằng mỗi điểm xi thuộc cluster gần nó nhất.
+
+* Cố định Y, tìm M
+- Giả sử đã tìm được cluster cho từng điểm, hãy tìm center mới cho mỗi cluster để hàm mất mát đạt giá trị min.
+- Bài toán tìm center được rút gọn thành:
+					mj = argmin(Tổng từ i = 1 đến N) yij||xi-mj||_2^2
+Ta có thể tìm nghiệm bằng phương pháp giải đạo hàm vì hàm cần tối ưu liên tục và có đạo hàm tại mọi điểm.
+- Đặt l(mj) là hàm trong argmin. Lấy đạo hàm theo mj và giải đạo hàm bằng 0, ta được: mj = (Tổng các điểm dữ liệu trong cluster j)/ (Số lượng điểm dữ liệu trong cluster j)
+- Nói cách khác, mj là trung bình cộng của các điểm trong cluster j.
+=> Tên gọi K-means clustering.
+
+TÓM TẮT THUẬT TOÁN
+Đầu vào: Dữ liệu X và số lượng cluster cần tìm K.
+Đầu ra:
+1. Chọn K điểm bất kỳ làm các center ban đầu.
+2. Phân mỗi điểm dữ liệu vào cluster có center gần nó nhất.
+3. Nếu việc gán dữ liệu vào từng cluster ở bước 2 không thay đổi so với vòng lặp trước nó thì ta dừng thuật toán.
+4. Cập nhật center cho từng cluster bằng cách lấy trung bình cộng của tất cả các điểm dữ liệu đã được gán vào cluster đó sau bước 2.
+5. Quay lại bước 2.
+
+Một số chú ý về python:
+- Thư viện scipy.spatial.distance được dùng để tính khoảng cách giữa các cặp điểm trong 2 tập hợp.
+- Ma trận hiệp phương sai của tập hợp m biến ngẫu nhiên là một ma trận vuông hạng (m × m), trong đó các phần tử nằm trên đường chéo (từ trái sang phải, từ trên xuống dưới) lần lượt là phương sai tương ứng của các biến này.
+Ví dụ: 
+means = [[2, 2], [8, 3], [3, 6]]
+cov = [[1, 0], [0, 1]]
+X0 = np.random.multivariate_normal(means[0], cov, N)
+=> X0 là bộ dữ liệu gồm N số ngẫu nhiên được phân bố theo phân phối chuẩn (hình quả chuông) có kỳ vọng là [2, 2] và phương sai là [[1, 0], [0, 1]] - tức có tung độ và hoành độ nằm cách điểm kỳ vọng không quá 1 đơn vị.
+- [0]*N = "nối danh sách này với chính nó N lần"
+- axis = 0 => Theo cột. axis = 1 => Theo hàng.

@@ -1,0 +1,84 @@
+GIỚI THIỆU
+- 2 mô hình tuyến tính Linear Regression và PLA đều có chung một dạng:
+			y = f(w^T*x)
+trong đó f() được gọi là activation function.
+	+) Với Linear Regression, f(s) = s.
+	+) Với PLA, f(s) = sgn(s).
+- Mô hinhd thứ 3 - Logistic Regression: Đầu ra được thể hiện dưới dạng xác suất.
+	+) Giống Linear Regression: Đầu ra là số thực.
+	+) Giống PLA: Đầu ra bị chặn trong đoạn [0, 1].
+	+) Được sử dụng nhiều cho các bài toán classification.
+
+MÔ HÌNH LOGISTIC REGRESSION
+- Đầu ra dự đoán của Logistic Classification: f(x) = theta(w^T*x)
+- Hàm được chọn cần có 3 tính chấtL
+	+) Hàm số thực liên tục, bị chặn trong khoảng (0, 1).
+	+) Nếu coi điểm có tung độ = 1/2 làm điểm phân chia thì các điểm phân chia càng xa điểm này về phía bên trái có giá trị càng gần 0 và càng xa điểm này về phía phải có giá trị càng gần 1.
+	Điều này khớp với nhận xét rằng học càng nhiều thì xác suất đỗ càng cao và ngược lại.
+	+) Mượt => Có đạo hàm mọi nơi => Có thể tận dụng để tối ưu. 
+
+SIGMOID FUNCTION
+- Hàm signoid: f(s) = 1/(1+e^-s) = sigma(s) được sử dụng nhiều nhất vì:
+	+) Bị chặn trong khoảng (0, 1)
+	+) lim(s) s -> -vc = 0;lim(s) s -> +vc = 1
+	+) Đặc biệt hơn nữa: sigma'(s) = sigma(s)(1 - sigma(s))
+- Ngoài ra, hàm tanh cũng hay được sử dụng: tanh(s) = (e^s - e^-s)/(e^s + e^-s). Dễ dàng chứng minh được tanh(s) = 2sigma(2s) - 1
+
+HÀM MẤT MÁT VÀ PHƯƠNG PHÁP TỐI ƯU
+* Xây dựng hàm mất mát
+- Xác suất để một điểm dữ liệu rơi vào clas 1 là f(w^T*x) và rơi vào class 0 là 1 - f(w^T*x).
+	+) Ta có thể viết:
+		P(yi = 1| xi; w) = f(w^T*xi)
+		P(yi = 0| xi; w) = 1 - f(w^T*xi)  
+	+) Mục tiêu: Tìm w sao cho f(w^T*xi) càng gần 1 càng tốt với các điểm dữ liệu thuộc class 1 và ngược lại.
+- Ký hiệu: zi = f(w^T*xi), ta có:
+		P(yi|xi; w) = zi^yi(1-zi)^(1-yi)
+- Để mô hình gần với dữ liệu đã cho nhất, xác suất này cần đạt giá trị cao nhất.
+- Xét training set X = [x1, x2, ..., xN] và y = [y1, y2, ..., yN], ta cần tìm w để biểu thức sau đạt gía trị lớn nhất.
+		P(y|X; w), ta xem X, y là các biến ngẫu nhiên.
+- Nói cách khác: w = argmax_w(P(y|X; w))
+=> Bài toán Maxnimum likelihood estimation. Hàm phía sau argmax là hàm likelihood function.
+- Nếu các điểm dữ liệu được sinh ngẫu nhiên, ta có:
+		P(y| X; w)	= Tích từ 1 đến N (P(yi| xi; w)) 
+					= Tích từ 1 đến N (zi^yi*(1-zi)^(1-yi))
+- Lấy logarithm tự nhiên của hàm này rồi lấy ngược dấu để nó là hàm mất mát. Bài toán maximum likelihood trở thành bài toán tìm giá trị nhỏ nhất của hàm mất mát (negative log likelihood):
+		J(w) 	= - log P(y| X; w) 
+				= - Tổng i = 1 đến N (yi*log(zi) + (1-yi)log(1-zi))
+	+) Hàm vế phải được gọi là cross entropy, được dùng để đo khoảng cách giữa hai phân phối.
+	+) Trong bài toán, một phân phối là dữ liệu được cho với xác suất 0, 1. Phân phối còn lại tính theo mô hình logistic regression.
+	+) Khoảng cách hai phân phối nhỏ => Hai phân phối gần nhau.
+	
+TỐI ƯU HÀM MẤT MÁT
+Sử dụng SGD. 
+- Hàm mất mát với chỉ 1 điểm dữ liệu (xi; yi) là:
+		J(w; xi; yi) = -(yi*log(zi) + (1-yi)*log(1-zi))
+- Với đạo hàm: 
+		ơJ(w; xi, yi)/ơw 	= -(yi/zi - (1-yi)/(1-zi))*ơzi/ơw
+							= (zi-yi)/(zi(1-zi))*ơzi/ơw
+- Để gọn, ta cần tìm z = f(w^T*x) sao cho mẫu số bị triệt tiêu. Nếu đặt s = w^T*X, ta có:
+		ơzi/ơw = ơzi/ơs*ơs/ơw = ơzi/ơs*x.
+- Một cách trực qua, ta sẽ tìm hàm số z = f(s) sao cho: ơz/ơs = z(1-z)
+- Giải phương trình vi phân, ta tìm được: z = 1/(1+ e^-s) = sigma(s)
+
+CÔNG THỨC CẬP NHẬT CHO LOGISTIC SIGMOID REGRESSION
+- Như vậy: ơJ(w; xi, yi)/ơw = (zi-yi)xi
+=> Công thức cập nhật cho logistic regression là: w = w + eta(yi-zi)xi
+
+MỘT SỐ TÍNH CHẤT CỦA LOGISTIC REGRESSION
+- Logistic Regression thực ra được sử dụng nhiều trong các bài toán Classification
+	+) Sau khi tìm được mô hình, việc xác định class y cho một điểm dữ liệu được xác định bằng việc so sáng hai biểu thức xác suất.
+		P(y=1|x; w) và P(y=0x; w)
+- Boundary tạo  bởi Logistic Regression có dạng tuyến tính.
+	+) Theo lập luận trên thì chúng ta cần kiểm tra:
+		P(y=1| x; w) > 0.5
+		<=> 1/(1+e^(-w^T*x)) > 0.5
+		<=> e^(-w^T*x) < 1
+		<=> w^T*x > 0
+	+) Vậy boundary giữa hai class là phương trình tuyến tính: w^T*x
+	
+THẢO LUẬN
+- Logistic Regression > PLA vì nó không cần có giả thiết dữ liệu hai class là linearly separable. Tuy nhiên, boundary tìm được vẫn có dạng tuyến tính.
+	+) Logistic Regression không làm được với dữ liệu mà 1 class chứa các điểm nằm trong 1 vòng tròn còn class kia chứa cacs điểm ngoài vòng tròn.
+	=> Không làm được với dữ liệu phi tuyến.
+- Hạn chế; Yêu cầu các điểm dữ liệu được tạo ra một cách độc lập. Tuy nhiên, trên thực tế, các điểm dữ liệu có thể ảnh ưởng với nhau.
+
